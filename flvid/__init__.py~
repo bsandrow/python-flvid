@@ -1,0 +1,92 @@
+import httplib2
+import json
+import re
+import lxml.html
+from urllib   import unquote
+from StringIO import StringIO
+from pprint   import pprint as PP
+
+registered_processors = []
+
+class Flvid(object):
+    def download_video(self, url):
+        for cls in registered_processors:
+            proc = cls()
+            if proc.should_process_url(url):
+                return proc.process(url)
+        return None
+
+class FlvidProcessor(object):
+    def should_process_url(self, url):
+        """ Determine if this processor thinks it should process this url """
+        if type(self.url_re) == str:
+            return self.url.starts_with(self.url_re)
+        else:
+            m = self.url_re.search(url)
+            return m is not None
+
+    def process(self, url):
+        """ (Stub) Extract a direct flash video url from the passed url. """
+        raise UnimplementedError('Function unimplemented')
+
+class YouTube(FlvidProcessor):
+    formats = {
+        '43': { 'type': 'video/webm', 'quality': 'medium','size': '640x480' },
+        '44': { 'type': 'video/webm', 'quality': 'large', 'size': '854x480' },
+        '45': { 'type': 'video/webm', 'quality': 'hd720', 'size': '1280x720'},
+        '18': { 'type': 'video/mp4',  'quality': 'medium','size': '640x360' },
+        '22': { 'type': 'video/mp4',  'quality': 'hd720', 'size': '1280x720'},
+        '37': { 'type': 'video/mp4',  'quality': 'hd1080','size': '1920x1080'},
+        '34': { 'type': 'video/x-flv','quality': 'medium','size': '640x360' },
+        '35': { 'type': 'video/x-flv','quality': 'large', 'size': '854x480' },
+        '5':  { 'type': 'video/x-flv','quality': 'small', 'size': '320x240' },
+    }
+
+    url_re = re.compile(r'^https?://(?:www\.)?youtube\.com/watch')
+
+    def _extract_fmt_stream_map(self, d):
+        fmt_stream_map = {}
+        tmp = [ x.split('|') for x in d['args']['fmt_stream_map'].split(',') ]
+        for x in tmp:
+            fmt_stream_map[x[0]] = x[1:]
+        return fmt_stream_map
+
+    def _extract_fmt_list(self, d):
+        return [
+            x.split('/') for x in d['args']['fmt_list'].split(',')
+        ]
+
+    def _available_formats(self, d):
+        return [
+            self._extract_fmt_stream_map(d).keys()
+
+    def extract_info(self, url):
+        h = httplib2.Http()
+        resp, content = h.request(url, 'GET')
+        tree = lxml.html.fromstring(content)
+        r = tree.xpath('/html/body/script[4]')
+        m = re.search(r'var swfConfig = (\{".*"\});', lxml.html.tostring(r[0]))
+        if m is None:
+            raise VideoPageParseError("Could not extract direct link")
+        swfconf = json.loads(m.group(1))
+        return {
+            'fmt_list': self._extract_fmt_list(swfconf),
+            'fmt_stream_map': self._extract_fmt_stream_map(swfconf),
+        }
+
+    def process(self, url):
+        info = self.extract_info(url)
+        PP(info)
+        return info
+
+registered_processors.append(YouTube)
+
+class UnimplementedError(Exception):
+    ''' Error to raise when a function is unimplemented. '''
+
+class VideoPageParseError(Exception):
+    ''' Error to parse page '''
+
+if __name__ == '__main__':
+    f = Flvid()
+    f.download_video('http://www.youtube.com/watch?v=nXFF5_GIsV0&feature=aso')
