@@ -51,9 +51,8 @@ class UnimplementedError(Exception):
 class VideoPageParseError(Exception):
     ''' Error to parse page '''
 
-for scraper in [ 'youtube' ]:
-    s = __import__('flvid.scrapers.%s' % scraper)
-    s.register()
+import flvid.scrapers.youtube as youtube
+youtube.register()
 
 if __name__ == '__main__':
     f = Flvid()
