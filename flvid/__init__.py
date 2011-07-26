@@ -1,5 +1,4 @@
 import re
-from pprint   import pprint as PP
 
 registered_scrapers = []
 
