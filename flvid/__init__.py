@@ -3,19 +3,19 @@ from pprint   import pprint as PP
 
 registered_scrapers = []
 
-class Flvid(object):
+class Controller(object):
     def determine_scraper(self, url):
         for cls in registered_scrapers:
             scraper = cls()
             if scraper.should_scrape_url(url):
-                return (cls.__name__, cls)
-        return ('', None)
+                return cls
+        return None
 
-    def get_video_url(self, url, scraper=None, format=None):
+    def get_video(self, url, scraper=None):
         if scraper is None:
-            sc = self.determine_scraper(url)
-            scraper = sc[1]()
-        return scraper.scrape_video(url, format)
+            sc      = self.determine_scraper(url)
+            scraper = sc()
+        return scraper.scrape_video(url)
 
 class Video(object):
     format_fallback_order = None
@@ -32,7 +32,13 @@ class Video(object):
                 return format
         return None
 
+    def __str__(self):
+        return "<%s (format_fallback_order: %s, all_formats: %s, format_urls: %s)>" \
+                    % (self.__class__.__name__, self.format_fallback_order, self.all_formats, self.format_urls)
+
 class Scraper(object):
+    video_class = None
+
     def should_scrape_url(self, url):
         """ Determine if this processor thinks it should process this url """
         if type(self.url_pattern) == str:
@@ -41,7 +47,7 @@ class Scraper(object):
             m = self.url_pattern.search(url)
             return m is not None
 
-    def process(self, url):
+    def scrape_video(self, url):
         """ (Stub) Extract a direct flash video url from the passed url. """
         raise UnimplementedError('Function unimplemented')
 
