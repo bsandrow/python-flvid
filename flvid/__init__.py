@@ -26,6 +26,7 @@ def get_video(url, scraper=None):
     return scraper.scrape_video(url)
 
 class Video(object):
+    title                 = None
     format_fallback_order = None
     all_formats           = None
     format_urls           = None

@@ -4,6 +4,9 @@ import httplib2
 import json
 import lxml.html
 
+import sys
+from pprint import pprint as PP
+
 class YouTubeVideo(flvid.Video):
     format_fallback_order = [
         '44', '35',         # prefer 'large' size
@@ -47,16 +50,34 @@ class YouTubeVideoScraper(flvid.Scraper):
     def scrape_video(self, url):
         resp, content = httplib2.Http().request(url, 'GET')
         tree = lxml.html.fromstring(content)
+
+        r = tree.xpath('''//span[@id='eow-title']''')
+        if len(r) != 1:
+            raise flvid.VideoPageParseError('XPath matched multiple video titles. Aborting.')
+        title = r[0].text_content().strip()
+
         r = tree.xpath('/html/body/script[4]')
         if len(r) != 1:
-            raise flvid.VideoPageParseError("XPath matched multiple <script> elements. Aborting.")
+            raise flvid.VideoPageParseError('XPath matched multiple <script> elements. Aborting.')
+
+        # Two different possible <script> setups, both with the same JSON
+        # passed through as the video player config.
         m = re.search(r'var swfConfig = (\{".*"\});', lxml.html.tostring(r[0]))
         if m is None:
-            raise flvid.VideoPageParseError("Could not find a video to extract on the page")
+            m = re.search(
+                    r'''yt\.setConfig\(\{\s*'PLAYER_CONFIG':\s*(\{".*"\})\s*\}\);''',
+                    lxml.html.tostring(r[0]),
+                    re.S | re.M)
+
+        if m is None:
+            raise flvid.VideoPageParseError('Could not find a video to extract on the page')
+
         swfconf = json.loads(m.group(1))
 
-        video = YouTubeVideo()
+        video             = YouTubeVideo()
         video.format_urls = self._fmt_to_url_map(swfconf)
+        video.title       = title
+
         return video
 
 def register():
