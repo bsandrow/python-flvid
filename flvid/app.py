@@ -28,10 +28,8 @@ def run():
         sys.exit(1)
     url = args.pop()
 
-    controller = flvid.Controller()
-
     if opts.display_info:
-        cls = controller.determine_scraper(url)
+        cls = flvid.determine_scraper(url)
         print 'Scraper     : %s' % cls.__name__
         print 'Video Class : %s' % cls.video_class.__name__
         print 'Format Order: %s' % ', '.join(cls.video_class.format_fallback_order)
@@ -39,7 +37,7 @@ def run():
         sys.exit()
 
 
-    video = controller.get_video(url)
+    video = flvid.get_video(url)
     if opts.formatlist:
         video.format_fallback_order = opts.formatlist.split(',')
 
