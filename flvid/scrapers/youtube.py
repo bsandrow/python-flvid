@@ -4,9 +4,6 @@ import httplib2
 import json
 import lxml.html
 
-import sys
-from pprint import pprint as PP
-
 class YouTubeVideo(flvid.Video):
     format_fallback_order = [
         '44', '35',         # prefer 'large' size
@@ -52,13 +49,17 @@ class YouTubeVideoScraper(flvid.Scraper):
         tree = lxml.html.fromstring(content)
 
         r = tree.xpath('''//span[@id='eow-title']''')
-        if len(r) != 1:
+        if len(r) > 1:
             raise flvid.VideoPageParseError('XPath matched multiple video titles. Aborting.')
+        if len(r) < 1:
+            raise flvid.VideoPageParseError('Could not determine title of video. Aborting.')
         title = r[0].text_content().strip()
 
         r = tree.xpath('/html/body/script[4]')
-        if len(r) != 1:
+        if len(r) > 1:
             raise flvid.VideoPageParseError('XPath matched multiple <script> elements. Aborting.')
+        if len(r) < 1:
+            raise flvid.VideoPageParseError('Could not find video url. Aborting.')
 
         # Two different possible <script> setups, both with the same JSON
         # passed through as the video player config.
