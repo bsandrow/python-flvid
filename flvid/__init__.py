@@ -80,9 +80,6 @@ class UnimplementedError(Exception):
 class VideoPageParseError(Exception):
     ''' Error to parse page '''
 
-import flvid.scrapers.youtube as youtube
-youtube.register()
-
-if __name__ == '__main__':
-    f = Flvid()
-    f.get_video_url('http://www.youtube.com/watch?v=nXFF5_GIsV0&feature=aso')
+for m in ['youtube']:
+    module = __import__('flvid.scrapers.%s' % m, fromlist=[m])
+    module.register()
