@@ -1,6 +1,11 @@
 import re
 
 registered_scrapers = []
+registered_formats = {
+    'flv':  { 'mimetype': 'video/x-flv', 'extension':'flv'  },
+    'mp4':  { 'mimetype': 'video/mp4',   'extension':'mp4'  },
+    'webm': { 'mimetype': 'video/webm',  'extension':'webm' },
+}
 
 def determine_scraper(url):
     ''' Match the url against the list of registered scrapers and return

@@ -14,15 +14,15 @@ class YouTubeVideo(flvid.Video):
     ]
 
     all_formats = {
-        '43': { 'type': 'video/webm',  'quality': 'medium', 'size': '640x480',  },
-        '44': { 'type': 'video/webm',  'quality': 'large',  'size': '854x480',  },
-        '45': { 'type': 'video/webm',  'quality': 'hd720',  'size': '1280x720', },
-        '18': { 'type': 'video/mp4',   'quality': 'medium', 'size': '640x360',  },
-        '22': { 'type': 'video/mp4',   'quality': 'hd720',  'size': '1280x720', },
-        '37': { 'type': 'video/mp4',   'quality': 'hd1080', 'size': '1920x1080',},
-        '34': { 'type': 'video/x-flv', 'quality': 'medium', 'size': '640x360',  },
-        '35': { 'type': 'video/x-flv', 'quality': 'large',  'size': '854x480',  },
-        '5':  { 'type': 'video/x-flv', 'quality': 'small',  'size': '320x240',  },
+        '43': { 'type': 'webm', 'quality': 'medium', 'size': '640x480',   },
+        '44': { 'type': 'webm', 'quality': 'large',  'size': '854x480',   },
+        '45': { 'type': 'webm', 'quality': 'hd720',  'size': '1280x720',  },
+        '18': { 'type': 'mp4',  'quality': 'medium', 'size': '640x360',   },
+        '22': { 'type': 'mp4',  'quality': 'hd720',  'size': '1280x720',  },
+        '37': { 'type': 'mp4',  'quality': 'hd1080', 'size': '1920x1080', },
+        '34': { 'type': 'flv',  'quality': 'medium', 'size': '640x360',   },
+        '35': { 'type': 'flv',  'quality': 'large',  'size': '854x480',   },
+        '5':  { 'type': 'flv',  'quality': 'small',  'size': '320x240',   },
     }
 
     @classmethod
