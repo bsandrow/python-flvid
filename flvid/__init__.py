@@ -1,7 +1,8 @@
 import re
+import urllib
 
 registered_scrapers = []
-registered_formats = {
+registered_types = {
     'flv':  { 'mimetype': 'video/x-flv', 'extension':'flv'  },
     'mp4':  { 'mimetype': 'video/mp4',   'extension':'mp4'  },
     'webm': { 'mimetype': 'video/webm',  'extension':'webm' },
@@ -26,6 +27,11 @@ def get_video(url, scraper=None):
     return scraper.scrape_video(url)
 
 class Video(object):
+    ''' A representation of the video that is encompassed by a video page that
+    is being parsed. This allows easy storage of relevant metadata out of the
+    parser, and allows a separation between the acts of parsing the metadata
+    from the page and performing actions on that metadata. '''
+
     title                 = None
     format_fallback_order = None
     all_formats           = None
@@ -36,6 +42,11 @@ class Video(object):
         return self.format_urls.keys()
 
     def default_format(self):
+        ''' Return the default format key. Runs through
+        self.format_fallback_order in order, and returns the first key it finds
+        in self.available_formats. Returns None if there is no intersection
+        between self.available_formats and self.format_fallback_order.
+        '''
         for format in self.format_fallback_order:
             if format in self.available_formats:
                 return format
@@ -47,6 +58,43 @@ class Video(object):
         afs = 'all_formats: %s' % self.all_formats
         fus = 'format_urls: %s' % self.format_urls
         return "<%s (%s, %s, %s)>" % (cls, ffo, afs, fus)
+
+    def dest_filebase(self):
+        ''' This is a small abstraction to allow sub-classes to easily change
+        the base of the filename from the default of self.title without needing
+        to re-implement all of the functionality in Video.build_dest() '''
+        return self.title
+
+    def build_dest(self, dest=None, format=None):
+        ''' Return the path to the file we want to download the video to. Uses
+        the default format if no format is passed in. Uses the default file
+        basename + the current directory if dest is None. Otherwise, it just
+        passes dest back out. '''
+        if format is None:
+            extension = registered_types[self.all_formats[self.default_format]['type']]
+        else:
+            extension = registered_types[self.all_formats[format]['type']]
+
+        if dest is None:
+            dir  = os.path.getcwd()
+            file = '%s.%s' % (self.dest_filebase, extension)
+        elif os.path.isdir(dest):
+            dir  = dest
+            file = '%s.%s' % (self.dest_filebase, extension)
+        else:
+            return dest
+
+        return os.path.join(dir, file)
+
+    def download_video(self, format=None, dest=None):
+        ''' Download the video that an instance of this class (or sub-class)
+        represents. Attaching this functionality to the Video() class allows
+        sub-classes to do whatever funkiness is needed (such as constructing
+        weird http requests) internally, rather than requiring the user of this
+        class to understand and implement that functionality. '''
+        destination = self.build_dest(dest, format)
+        url         = self.format_urls[format if format is not None else self.default_format()]
+        return urllib.urlretrive(url, destination)
 
 class Scraper(object):
     ''' A base object for video page scrapers. At least initially, this base
