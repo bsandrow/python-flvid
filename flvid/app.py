@@ -41,9 +41,6 @@ def run():
     if opts.formatlist:
         video.format_fallback_order = opts.formatlist.split(',')
 
-    format      = video.default_format()
-    video_url   = video.format_urls[format]
-
-    print "videourl: %s" % video_url
+    video.download_video(format=format, dest=(opts.outfile or None))
 
 
