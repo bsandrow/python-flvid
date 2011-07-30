@@ -1,23 +1,20 @@
-python-flvid
-============
+flvid
+=====
 
-A framework for building web video scrapers.
+A framework for building web video scrapers. The main narrative goes like this:
+
+1. You pass a URL to a scraper
+2. The scraper extracts the video link and associated metadata and stores it in
+   a object that is a sub-class of flvid.Video.
+3. The Video object has methods on it for interacting with the associated
+   metadata, including downloading the video to a file.
 
 Usage
 -----
 
-    usage: flvid [options] url
-
-    options:
-      -f --format=FORMAT    Specify the preferred format list as a string
-                            of comma-separated values. This option will be
-                            ignored for videos that only have a single format.
-
-      --format-info         Display info for the format that corresponds with
-                            the current url.
-
-      -o --outfile=FILE     The file to save the video to.
-
+    import flvid
+    video = flvid.get_video('http://www.youtube.com/?v=afgdfgdfgfag')
+    video.download_video(dest='/tmp')
 
 Copyright
 ---------
