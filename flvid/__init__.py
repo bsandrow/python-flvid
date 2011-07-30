@@ -1,5 +1,6 @@
 import re
 import urllib
+import os
 
 registered_scrapers = []
 registered_types = {
@@ -41,6 +42,7 @@ class Video(object):
     def available_formats(self):
         return self.format_urls.keys()
 
+    @property
     def default_format(self):
         ''' Return the default format key. Runs through
         self.format_fallback_order in order, and returns the first key it finds
@@ -71,16 +73,16 @@ class Video(object):
         basename + the current directory if dest is None. Otherwise, it just
         passes dest back out. '''
         if format is None:
-            extension = registered_types[self.all_formats[self.default_format]['type']]
+            extension = registered_types[self.all_formats[self.default_format]['type']]['extension']
         else:
-            extension = registered_types[self.all_formats[format]['type']]
+            extension = registered_types[self.all_formats[format]['type']]['extension']
 
         if dest is None:
-            dir  = os.path.getcwd()
-            file = '%s.%s' % (self.dest_filebase, extension)
+            dir  = os.getcwd()
+            file = '%s.%s' % (self.dest_filebase(), extension)
         elif os.path.isdir(dest):
             dir  = dest
-            file = '%s.%s' % (self.dest_filebase, extension)
+            file = '%s.%s' % (self.dest_filebase(), extension)
         else:
             return dest
 
@@ -93,8 +95,8 @@ class Video(object):
         weird http requests) internally, rather than requiring the user of this
         class to understand and implement that functionality. '''
         destination = self.build_dest(dest, format)
-        url         = self.format_urls[format if format is not None else self.default_format()]
-        return urllib.urlretrive(url, destination)
+        url         = self.format_urls[format if format is not None else self.default_format]
+        return urllib.urlretrieve(url, destination)
 
 class Scraper(object):
     ''' A base object for video page scrapers. At least initially, this base
