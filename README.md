@@ -13,8 +13,20 @@ Usage
 -----
 
     import flvid
-    video = flvid.get_video('http://www.youtube.com/?v=afgdfgdfgfag')
+    video = flvid.get_video('http://www.example.com/afgdfgdfgfag')
     video.download_video(dest='/tmp')
+
+Legal Note
+----------
+
+This framework is created under the assumption that it is the user's
+responsibility to determine whether their copying falls under fair use, or that
+they have permission to create copies of said videos.
+
+Roadmap
+-------
+
+* I need to put some TLC into flvid.app
 
 Copyright
 ---------
