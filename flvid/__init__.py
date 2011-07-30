@@ -131,6 +131,6 @@ class UnimplementedError(Exception):
 class VideoPageParseError(Exception):
     ''' Error to parse page '''
 
-for m in ['youtube']:
+for m in ['youtube', 'xvideos']:
     module = __import__('flvid.scrapers.%s' % m, fromlist=[m])
     module.register()
