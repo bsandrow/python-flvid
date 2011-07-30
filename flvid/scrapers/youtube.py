@@ -38,7 +38,7 @@ class YouTubeVideoScraper(flvid.Scraper):
 
     def _fmt_to_url_map(self, info):
         fmt_to_url = {}
-        fmt_stream_map = info['args']['fmt_stream_map'].split(',')
+        fmt_stream_map = info['args']['fmt_url_map'].split(',')
         for stream in fmt_stream_map:
             stream_parts = stream.split('|')
             fmt_to_url[stream_parts[0]] = stream_parts[1]

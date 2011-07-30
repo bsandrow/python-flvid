@@ -61,11 +61,14 @@ class Video(object):
         fus = 'format_urls: %s' % self.format_urls
         return "<%s (%s, %s, %s)>" % (cls, ffo, afs, fus)
 
+    def filter_title(self, title):
+        return re.sub(os.sep, '_', title)
+
     def dest_filebase(self):
         ''' This is a small abstraction to allow sub-classes to easily change
         the base of the filename from the default of self.title without needing
         to re-implement all of the functionality in Video.build_dest() '''
-        return self.title
+        return filter_title(self.title)
 
     def build_dest(self, dest=None, format=None):
         ''' Return the path to the file we want to download the video to. Uses
