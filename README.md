@@ -19,9 +19,8 @@ Usage
 Legal Note
 ----------
 
-This framework is created under the assumption that it is the user's
-responsibility to determine whether their copying falls under fair use, or that
-they have permission to create copies of said videos.
+It is the end-user's responsibility to determine whether their copying falls
+under fair use, or that they have permission to create copies of said videos.
 
 Roadmap
 -------
